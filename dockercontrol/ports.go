@@ -1,7 +1,6 @@
 package dockercontrol
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/docker/go-connections/nat"
@@ -35,6 +34,6 @@ func bindPortsBuilder(ports []string) (map[nat.Port][]nat.PortBinding, []string)
 		}
 
 	}
-	fmt.Println(bindings)
+	//fmt.Println(bindings)
 	return bindings, errors
 }

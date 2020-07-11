@@ -18,7 +18,7 @@ func ReadDCfile(path string) DockerCompose {
 	if erro != nil {
 		fmt.Println(err)
 	}
-	fmt.Print(t)
+	//fmt.Print(t)
 	return t
 	//return t, err
 }

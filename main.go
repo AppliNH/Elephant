@@ -16,9 +16,13 @@ func main() {
 
 	abs, err := filepath.Abs(a[1])
 	if err == nil {
-		fmt.Println(abs)
+		var elephantName string
+		fmt.Println("Here's the path of your stack: " + abs)
+		fmt.Println("Give your elephant a name please: ")
+		fmt.Scanln(&elephantName)
+
 		t := ReadDCfile(abs)
-		StartStack(t)
+		StartStack(t, elephantName)
 
 		//CreateNewContainer(abs)
 	}

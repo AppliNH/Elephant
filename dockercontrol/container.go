@@ -1,6 +1,7 @@
 package dockercontrol
 
 import (
+	. "applinh/elephant/dockermng"
 	. "applinh/elephant/models"
 	"context"
 	"fmt"
@@ -12,8 +13,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func createContainers(cli *client.Client, services map[string]Service, networks map[string]string) {
-	fmt.Print("createContainers")
+func createContainers(cli *client.Client, services map[string]Service, networks map[string]string, elephantName string) {
 
 	for name, service := range services {
 
@@ -23,7 +23,9 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 		for n, id := range networks {
 			endpointsConfig[n] = &network.EndpointSettings{NetworkID: id}
 		}
+
 		var containerConfig = &container.Config{Image: service.Image}
+
 		if service.Command != "" {
 			containerConfig = &container.Config{
 				Image: service.Image,
@@ -36,7 +38,7 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 				PortBindings: portBinding,
 			}, &network.NetworkingConfig{
 				EndpointsConfig: endpointsConfig,
-			}, name)
+			}, elephantName+"_"+name)
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -44,6 +46,8 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 			fmt.Println(cont.ID)
 		}
 		cli.ContainerStart(context.Background(), cont.ID, types.ContainerStartOptions{})
+		//logsChan := make(chan io.ReadCloser)
+		ReadLogs(cli, cont.ID)
 
 	}
 
