@@ -1,28 +1,62 @@
 package dockermng
 
 import (
+	. "applinh/elephant/models"
+	"bufio"
 	"context"
+	"fmt"
 	"io"
-	"log"
 	"os"
-	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+
+	"github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 )
 
-func ReadLogs(cli *client.Client, contID string) {
+func ReadLogs(cli *client.Client, containers map[string]RunningContainer) {
+	fmt.Println(len(containers))
+	c := make(chan map[string]*bufio.Reader)
+	readers := map[string]*bufio.Reader{}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	reader, err := cli.ContainerLogs(ctx, contID, types.ContainerLogsOptions{ShowStdout: true})
-	if err != nil {
-		log.Fatal(err)
+	for _, container := range containers {
+		hi, _ := cli.ContainerAttach(context.Background(), container.ID, types.ContainerAttachOptions{Stdout: true, Logs: true, Stderr: true, Stream: true})
+		readers[container.ID] = hi.Reader
 	}
 
-	_, err = io.Copy(os.Stdout, reader)
-	if err != nil && err != io.EOF {
-		log.Fatal(err)
+	for id, reader := range readers {
+		go follow(map[string]*bufio.Reader{id: reader}, c)
 	}
+	// ui.Init()
+	// w := createLogBoxes(containers)
+	// ui.Render(w...)
+	for msg := range c {
+		for _, v := range msg {
+			if v.Size() > 0 {
+				fmt.Println()
+				io.Copy(os.Stdout, v)
+			}
+		}
+
+	}
+}
+
+func createLogBoxes(containers map[string]RunningContainer) []termui.Drawable {
+
+	widgetsList := []termui.Drawable{}
+	var x int
+	for _, container := range containers {
+
+		p := widgets.NewParagraph()
+		p.Title = container.Name
+		p.SetRect(x, 0, 25, 50)
+		widgetsList = append(widgetsList, p)
+		x += 30
+	}
+	return widgetsList
+}
+
+func follow(r map[string]*bufio.Reader, c chan map[string]*bufio.Reader) {
+	c <- r
 }

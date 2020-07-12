@@ -15,8 +15,9 @@ import (
 
 func createContainers(cli *client.Client, services map[string]Service, networks map[string]string, elephantName string) {
 
-	for name, service := range services {
+	containers := map[string]RunningContainer{}
 
+	for name, service := range services {
 		portBinding, _ := bindPortsBuilder(service.Ports)
 		endpointsConfig := make(map[string]*network.EndpointSettings)
 
@@ -43,12 +44,29 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 		if err != nil {
 			fmt.Println(err.Error())
 		} else {
-			fmt.Println(cont.ID)
+			containers[cont.ID] = RunningContainer{ID: cont.ID, Name: elephantName + "_" + name, Elephant: elephantName}
+			//fmt.Println(cont.ID)
 		}
-		cli.ContainerStart(context.Background(), cont.ID, types.ContainerStartOptions{})
-		//logsChan := make(chan io.ReadCloser)
-		ReadLogs(cli, cont.ID)
 
 	}
+
+	for _, container := range containers {
+		startContainer(container.ID, cli)
+		//logsChan := make(chan io.ReadCloser)
+	}
+
+	ReadLogs(cli, containers)
+
+}
+
+func startContainer(id string, cli *client.Client) {
+	if err := cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{}); err != nil {
+		fmt.Println(err)
+	}
+
+	// ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	// defer cancel()
+
+	//ReadLogs(cli, id)
 
 }
