@@ -5,8 +5,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io"
-	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -17,26 +15,28 @@ import (
 
 func ReadLogs(cli *client.Client, containers map[string]RunningContainer) {
 	fmt.Println(len(containers))
-	c := make(chan map[string]*bufio.Reader)
-	readers := map[string]*bufio.Reader{}
+	c := make(chan *bufio.Reader, len(containers))
+	readers := map[RunningContainer]*bufio.Reader{}
 
 	for _, container := range containers {
 		hi, _ := cli.ContainerAttach(context.Background(), container.ID, types.ContainerAttachOptions{Stdout: true, Logs: true, Stderr: true, Stream: true})
-		readers[container.ID] = hi.Reader
+		readers[container] = hi.Reader
 	}
 
-	for id, reader := range readers {
-		go follow(map[string]*bufio.Reader{id: reader}, c)
+	for container, reader := range readers {
+		go follow(reader,container, c)
 	}
 	// ui.Init()
 	// w := createLogBoxes(containers)
 	// ui.Render(w...)
-	for msg := range c {
-		if msg != nil {
-			fmt.Println("pop it")
-		}
 
+	for {
+		select {
+			case <-c:
+				fmt.Println()
+		}
 	}
+
 }
 
 func createLogBoxes(containers map[string]RunningContainer) []termui.Drawable {
@@ -54,10 +54,11 @@ func createLogBoxes(containers map[string]RunningContainer) []termui.Drawable {
 	return widgetsList
 }
 
-func follow(r map[string]*bufio.Reader, c chan map[string]*bufio.Reader) {
-	fmt.Println("follow")
-	for _,v := range r {
-		io.Copy(os.Stdout,v)
-	}
+func follow(r *bufio.Reader,container RunningContainer, c chan *bufio.Reader) {
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		fmt.Println(container.Name +": "+scanner.Text())
+	  }
+	
 	c <- r
 }
