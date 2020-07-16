@@ -32,11 +32,8 @@ func ReadLogs(cli *client.Client, containers map[string]RunningContainer) {
 	// w := createLogBoxes(containers)
 	// ui.Render(w...)
 	for msg := range c {
-		for _, v := range msg {
-			if v.Size() > 0 {
-				fmt.Println()
-				io.Copy(os.Stdout, v)
-			}
+		if msg != nil {
+			fmt.Println("pop it")
 		}
 
 	}
@@ -58,5 +55,9 @@ func createLogBoxes(containers map[string]RunningContainer) []termui.Drawable {
 }
 
 func follow(r map[string]*bufio.Reader, c chan map[string]*bufio.Reader) {
+	fmt.Println("follow")
+	for _,v := range r {
+		io.Copy(os.Stdout,v)
+	}
 	c <- r
 }

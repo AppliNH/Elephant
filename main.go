@@ -22,6 +22,7 @@ func main() {
 		fmt.Scanln(&elephantName)
 
 		t := ReadDCfile(abs)
+		fmt.Println(t)
 		StartStack(t, elephantName)
 
 		//CreateNewContainer(abs)

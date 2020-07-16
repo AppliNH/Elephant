@@ -16,6 +16,7 @@ import (
 func createContainers(cli *client.Client, services map[string]Service, networks map[string]string, elephantName string) {
 
 	containers := map[string]RunningContainer{}
+	fmt.Println(services)
 
 	for name, service := range services {
 		portBinding, _ := bindPortsBuilder(service.Ports)
@@ -24,8 +25,13 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 		for n, id := range networks {
 			endpointsConfig[n] = &network.EndpointSettings{NetworkID: id}
 		}
+		fmt.Println("ServiceImage: " + service.Image)
+		if _, err := cli.ImagePull(context.Background(), service.Image, types.ImagePullOptions{}); err != nil {
+			fmt.Println("ImagePull: " + err.Error())
+		}
 
 		var containerConfig = &container.Config{Image: service.Image}
+		fmt.Println("Speified Command: " + service.Command)
 
 		if service.Command != "" {
 			containerConfig = &container.Config{
@@ -33,6 +39,7 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 				Cmd:   strings.Split(service.Command, " "),
 			}
 		}
+
 		cont, err := cli.ContainerCreate(
 			context.Background(), containerConfig,
 			&container.HostConfig{
@@ -42,14 +49,14 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 			}, elephantName+"_"+name)
 
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Println("ContainerCreate: " + err.Error())
 		} else {
 			containers[cont.ID] = RunningContainer{ID: cont.ID, Name: elephantName + "_" + name, Elephant: elephantName}
-			//fmt.Println(cont.ID)
+			fmt.Println(cont.ID)
 		}
 
 	}
-
+	fmt.Println(strings.Repeat("_", 25))
 	for _, container := range containers {
 		startContainer(container.ID, cli)
 		//logsChan := make(chan io.ReadCloser)
