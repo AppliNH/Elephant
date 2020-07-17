@@ -24,8 +24,12 @@ func main() {
 
 		switch a[1] {
 		case "walk":
-			if abs, err := filepath.Abs(a[2]); err == nil {
-				Walk(db, abs)
+			if len(a) > 3 {
+				if abs, err := filepath.Abs(a[2]); err == nil {
+					Walk(db, abs)
+				}
+			} else {
+				fmt.Println("You must provide the path to your docker-compose file like this : ~/garbageDir/poop.yml or ./garbageDir/poop.yml")
 			}
 		case "ls":
 			List(db)
@@ -35,7 +39,8 @@ func main() {
 			} else {
 				fmt.Println("You haven't provided any elephant name")
 			}
-
+		case "help":
+			Help()
 		default:
 			fmt.Println("An error has occured")
 
