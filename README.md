@@ -34,7 +34,6 @@ I'd recommend to set your GOPATH env variable and then run `go install applinh/e
 ## 🐘❤️
 
 Feel free to git clone this, or open any pull request to contribute.
-I'll add a thanklist later, now I gotta see some shine ☀️
 
 Much luv <3
 
