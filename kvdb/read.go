@@ -1,10 +1,26 @@
 package kvdb
 
-import "github.com/boltdb/bolt"
+import (
+	"fmt"
 
+	"github.com/boltdb/bolt"
+)
 
-func ReadData(tx *bolt.Tx,key string) string {
-	b := tx.Bucket([]byte("stacks"))
-	v := b.Get([]byte(key))
-	return string(v)
+func ReadData(db *bolt.DB, key string) string {
+
+	var res []byte
+
+	err := db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte("stacks"))
+
+		res = bucket.Get([]byte(key))
+
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return string(res)
 }
