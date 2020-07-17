@@ -29,14 +29,15 @@ You can either use `go run main.go`, or `./elephant` if you previously run `go b
 - `elephant stomp myStack`
 - `elephant ls`
 
-## 🐘
+I'd recommend to set your GOPATH env variable and then run `go install applinh/elephant` so you can directly use the `elephant` command anywhere.
+
+## 🐘❤️
 
 Feel free to git clone this, or open any pull request to contribute.
 I'll add a thanklist later, now I gotta see some shine ☀️
 
 Much luv <3
-(please create an empty `db` folder at the root when you `git clone` this)
 
-(don't worry I'll fix this up asap)
+Special thanks to [BoltDB](https://github.com/boltdb/bolt) and also [Docker](https://pkg.go.dev/github.com/docker/docker) for their work.
 
 
