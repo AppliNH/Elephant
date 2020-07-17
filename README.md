@@ -35,7 +35,7 @@ Feel free to git clone this, or open any pull request to contribute.
 I'll add a thanklist later, now I gotta see some shine ☀️
 
 Much luv <3
-(please create an empty `db` folder at the root when you git clone this)
+(please create an empty `db` folder at the root when you `git clone` this)
 
 (don't worry I'll fix this up asap)
 
