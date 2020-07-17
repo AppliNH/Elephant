@@ -34,8 +34,10 @@ func main() {
 		case "ls":
 			List(db)
 		case "stomp":
-			if a[2] != "" {
-				Stomp(db, a[2])
+			if len(a) > 3 {
+				if a[2] != "" {
+					Stomp(db, a[2])
+				}
 			} else {
 				fmt.Println("You haven't provided any elephant name")
 			}
