@@ -43,3 +43,11 @@ func StopContainer(containerID string) error {
 	}
 	return err
 }
+
+func InspectContainer(containerID string) (types.ContainerJSON, error) {
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+	return cli.ContainerInspect(context.Background(), containerID)
+}

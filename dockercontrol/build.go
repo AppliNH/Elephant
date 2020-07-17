@@ -29,6 +29,10 @@ func StartStack(db *bolt.DB, DC DockerCompose, elephantName string) {
 		WriteData(db, elephantName, strings.Join(contIDs, ","))
 		//fmt.Println(ReadData(db, elephantName))
 		//db.Close()
+		fmt.Println(strings.Repeat("_", 25))
+		fmt.Println("Logs")
+		fmt.Println(strings.Repeat("_", 25))
+		fmt.Println()
 		ReadLogs(cli, containers)
 	} else {
 		fmt.Println("An error has occured")
