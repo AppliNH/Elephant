@@ -24,7 +24,7 @@ func main() {
 		if len(a) > 1 {
 			switch a[1] {
 			case "walk":
-				if len(a) > 3 {
+				if len(a) > 2 {
 					if abs, err := filepath.Abs(a[2]); err == nil {
 						Walk(db, abs)
 					}
@@ -34,7 +34,7 @@ func main() {
 			case "ls":
 				List(db)
 			case "stomp":
-				if len(a) > 3 {
+				if len(a) > 2 {
 					if a[2] != "" {
 						Stomp(db, a[2])
 					}
