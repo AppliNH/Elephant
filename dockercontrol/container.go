@@ -1,7 +1,6 @@
 package dockercontrol
 
 import (
-	. "applinh/elephant/dockermng"
 	. "applinh/elephant/models"
 	"context"
 	"fmt"
@@ -13,10 +12,9 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func createContainers(cli *client.Client, services map[string]Service, networks map[string]string, elephantName string) {
+func createContainers(cli *client.Client, services map[string]Service, networks map[string]string, elephantName string) (map[string]RunningContainer, error) {
 
 	containers := map[string]RunningContainer{}
-	fmt.Println(services)
 
 	for name, service := range services {
 		portBinding, _ := bindPortsBuilder(service.Ports)
@@ -25,13 +23,14 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 		for n, id := range networks {
 			endpointsConfig[n] = &network.EndpointSettings{NetworkID: id}
 		}
-		fmt.Println("ServiceImage: " + service.Image)
-		if _, err := cli.ImagePull(context.Background(), service.Image, types.ImagePullOptions{}); err != nil {
-			fmt.Println("ImagePull: " + err.Error())
+		//fmt.Println("ServiceImage: " + service.Image)
+		if _, err := cli.ImagePull(context.Background(), "docker.io/"+service.Image, types.ImagePullOptions{}); err != nil {
+			//fmt.Println("ImagePull: " + err.Error())
+			return nil, err
 		}
 
 		var containerConfig = &container.Config{Image: service.Image}
-		fmt.Println("Speified Command: " + service.Command)
+		//fmt.Println("Speified Command: " + service.Command)
 
 		if service.Command != "" {
 			containerConfig = &container.Config{
@@ -49,27 +48,32 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 			}, elephantName+"_"+name)
 
 		if err != nil {
-			fmt.Println("ContainerCreate: " + err.Error())
+			//fmt.Println("ContainerCreate: " + err.Error())
+			return nil, err
 		} else {
 			containers[cont.ID] = RunningContainer{ID: cont.ID, Name: elephantName + "_" + name, Elephant: elephantName}
-			fmt.Println(cont.ID)
+			//fmt.Println(cont.ID)
 		}
 
 	}
-	fmt.Println(strings.Repeat("_", 25))
+
 	for _, container := range containers {
-		startContainer(container.ID, cli)
+		if err := startContainer(container.ID, cli); err == nil {
+			fmt.Println("Sucessfully started " + container.Name + " from elephant " + container.Elephant)
+		} else {
+			fmt.Println(err.Error())
+		}
+
 		//logsChan := make(chan io.ReadCloser)
 	}
-
-	ReadLogs(cli, containers)
+	fmt.Println(strings.Repeat("_", 25))
+	return containers, nil
 
 }
 
-func startContainer(id string, cli *client.Client) {
-	if err := cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{}); err != nil {
-		fmt.Println(err)
-	}
+func startContainer(id string, cli *client.Client) error {
+	err := cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{})
+	return err
 
 	// ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	// defer cancel()

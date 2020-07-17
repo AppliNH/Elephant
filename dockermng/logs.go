@@ -14,7 +14,7 @@ import (
 )
 
 func ReadLogs(cli *client.Client, containers map[string]RunningContainer) {
-	fmt.Println(len(containers))
+
 	c := make(chan *bufio.Reader, len(containers))
 	readers := map[RunningContainer]*bufio.Reader{}
 
@@ -24,7 +24,7 @@ func ReadLogs(cli *client.Client, containers map[string]RunningContainer) {
 	}
 
 	for container, reader := range readers {
-		go follow(reader,container, c)
+		go follow(reader, container, c)
 	}
 	// ui.Init()
 	// w := createLogBoxes(containers)
@@ -32,8 +32,8 @@ func ReadLogs(cli *client.Client, containers map[string]RunningContainer) {
 
 	for {
 		select {
-			case <-c:
-				fmt.Println()
+		case <-c:
+			fmt.Println()
 		}
 	}
 
@@ -54,11 +54,11 @@ func createLogBoxes(containers map[string]RunningContainer) []termui.Drawable {
 	return widgetsList
 }
 
-func follow(r *bufio.Reader,container RunningContainer, c chan *bufio.Reader) {
+func follow(r *bufio.Reader, container RunningContainer, c chan *bufio.Reader) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
-		fmt.Println(container.Name +": "+scanner.Text())
-	  }
-	
+		fmt.Println(container.Name + ": " + scanner.Text())
+	}
+
 	c <- r
 }

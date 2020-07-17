@@ -13,7 +13,6 @@ type Vol struct {
 	Labels map[string]string
 }
 
-
 func ListContainers() ([]types.Container, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
