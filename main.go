@@ -1,11 +1,11 @@
 package main
 
 import (
-	. "applinh/elephant/dcfile"
-	. "applinh/elephant/dockercontrol"
+	. "applinh/elephant/commands"
 	"fmt"
 	"os"
 
+	. "applinh/elephant/kvdb"
 	"path/filepath"
 )
 
@@ -14,17 +14,24 @@ func main() {
 	a := os.Args
 
 	fmt.Println("Hi, and welcome to Elephant 🐘")
-	abs, err := filepath.Abs(a[1])
-	if err == nil {
-		var elephantName string
-		fmt.Println("Here's the path of your stack: " + abs)
-		fmt.Println("Give your elephant a name please: ")
-		fmt.Scanln(&elephantName)
+	// tx,err := InitDB()
+	// if err == nil {
+	// 	WriteData(tx, "ok", "okiii")
+	// }
 
-		t := ReadDCfile(abs)
-		fmt.Println(t)
-		StartStack(t, elephantName)
+	// fmt.Println(ReadData(tx, "ok"))
+	
 
-		//CreateNewContainer(abs)
+	
+
+	switch a[1] {
+	case "walk":
+		if abs, err := filepath.Abs(a[2]); err == nil {
+			Walk(abs)
+		}
+	default:
+		fmt.Println("An error has occured")
+
 	}
+
 }
