@@ -32,6 +32,9 @@ func main() {
 					fmt.Println("You must provide the path to your docker-compose file like this : ~/garbageDir/poop.yml or ./garbageDir/poop.yml")
 				}
 			case "ls":
+				fmt.Println("List of elephants")
+				fmt.Println(strings.Repeat("_", 25))
+				fmt.Println()
 				List(db)
 			case "stomp":
 				if len(a) > 2 {
