@@ -1,7 +1,7 @@
 package dockermng
 
 import (
-	. "applinh/elephant/models"
+	. "github.com/applinh/elephant/models"
 	"bufio"
 	"context"
 	"fmt"

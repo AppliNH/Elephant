@@ -14,22 +14,28 @@ You also gotta tell them to start and carry them, using the command `walk`.
 
 Elephants are so so great that there are other commands they understand :)
 
+## Install
+
+You can either :
+- Run `go install github.com/applinh/elephant`
+- Or clone the repo if you previously run `go build -o elephant` and then use the binary `./elephant` 
 
 ## Commands
 
-- `walk`: Start a stack using a docker-compose file. The CLI will also ask you to name your elephant, this is important.
+- `walk`: Start a stack using a compose file. The CLI will also ask you to name your elephant, this is important.
+    - `-f` : Specify the past to your compose file
+    - `-e` : Specify the elephant name. If you don't specify any, the CLI will ask you to specify one in interactive mode
 - `ls`: List the elephants and the containers they carry.
 - `stomp`: Your elephant will drop and stomp on all the containers he carries (in a short way, it stops the containers associated to your elephant).
+    - You have to add an addition argument, which is the name of your elephant
 
 ## Examples
 
-You can either use `go run main.go`, or `./elephant` if you previously run `go build -o elephant`.
-
-- `elephant walk ~/garbageDir/cool.yml` or `elephant walk ./cool.yml`
+- `elephant walk -f ~/garbageDir/cool.yml` or `elephant walk -f ./cool.yml`
 - `elephant stomp myStack`
 - `elephant ls`
 
-I'd recommend to set your GOPATH env variable and then run `go install applinh/elephant` so you can directly use the `elephant` command anywhere.
+I'd recommend to set your GOPATH env variable and then run `go install github.com/applinh/elephant` so you can directly use the `elephant` command anywhere.
 
 ## 🐘❤️
 

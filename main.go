@@ -1,58 +1,22 @@
+/*
+Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package main
 
-import (
-	. "applinh/elephant/commands"
-	"fmt"
-	"os"
-	"strings"
-
-	. "applinh/elephant/kvdb"
-	"path/filepath"
-)
+import "github.com/applinh/elephant/cmd"
 
 func main() {
-
-	a := os.Args
-
-	fmt.Println("Hi, and welcome to Elephant 🐘")
-	fmt.Println(strings.Repeat("_", 25))
-	fmt.Println()
-	db, err := InitDB()
-	if err == nil {
-		//WriteData(tx, "ok", "boi")
-		//fmt.Println("main is: " + ReadData(db, "ok"))
-		if len(a) > 1 {
-			switch a[1] {
-			case "walk":
-				if len(a) > 2 {
-					if abs, err := filepath.Abs(a[2]); err == nil {
-						Walk(db, abs)
-					}
-				} else {
-					fmt.Println("You must provide the path to your docker-compose file like this : ~/garbageDir/poop.yml or ./garbageDir/poop.yml")
-				}
-			case "ls":
-				fmt.Println("List of elephants")
-				fmt.Println(strings.Repeat("_", 25))
-				fmt.Println()
-				List(db)
-			case "stomp":
-				if len(a) > 2 {
-					if a[2] != "" {
-						Stomp(db, a[2])
-					}
-				} else {
-					fmt.Println("You haven't provided any elephant name")
-				}
-			case "help":
-				Help()
-			default:
-				fmt.Println("An error has occured")
-
-			}
-		} else {
-			fmt.Println("You haven't provided any command.")
-			Help()
-		}
-	}
+	cmd.Execute()
 }

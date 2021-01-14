@@ -1,14 +1,14 @@
 package dockercontrol
 
 import (
-	. "applinh/elephant/models"
 	"context"
 
+	"github.com/applinh/elephant/models"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
 
-func createNetworks(cli *client.Client, networkNames map[string]Network) (map[string]string, map[string]string) {
+func createNetworks(cli *client.Client, networkNames map[string]models.Network) (map[string]string, map[string]string) {
 	networks := make(map[string]string)
 	errors := make(map[string]string)
 

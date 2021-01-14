@@ -1,40 +1,37 @@
 package commands
 
 import (
-	. "applinh/elephant/dockercontrol"
-	. "applinh/elephant/kvdb"
 	"fmt"
-	"regexp"
-	"strings"
+
+	"github.com/applinh/elephant/kvdb"
+	"github.com/applinh/elephant/models"
+
+	dctrl "github.com/applinh/elephant/dockercontrol"
 
 	"github.com/boltdb/bolt"
 )
 
+// List List all running stacks with their elephants name
 func List(db *bolt.DB) {
 
 	list := make(map[string]string)
-	list, _ = ReadAll(db)
+	list, _ = kvdb.ReadAll(db)
+	elephantsList := models.NewElephantArmy(list)
+	if len(elephantsList) > 0 {
 
-	if len(list) > 0 {
-
-		for k, v := range list {
-			var containNumber = regexp.MustCompile(`\d`)
-			if containNumber.MatchString(v) {
-				fmt.Println("🐘 " + k + ":")
-				containerIDs := strings.Split(v, ",")
-				for _, c := range containerIDs {
-					cont, err := InspectContainer(c)
-					if err != nil {
-						fmt.Println(err)
-					} else {
-						fmt.Println(cont.Name)
-					}
-
+		for _, item := range elephantsList {
+			fmt.Println("🐘 " + item.Name + ":")
+			for _, containerID := range item.Containers {
+				cont, err := dctrl.InspectContainer(containerID)
+				if err != nil {
+					fmt.Println(err)
 				}
+				fmt.Println(cont.Name + " (" + containerID + ")")
 			}
+
 		}
 	} else {
-		fmt.Println("No big boi found🙅")
+		fmt.Println("No big boi found 🙅")
 	}
 
 }

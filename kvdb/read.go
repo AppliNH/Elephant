@@ -1,12 +1,13 @@
 package kvdb
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/boltdb/bolt"
 )
 
-func ReadData(db *bolt.DB, key string) string {
+func ReadData(db *bolt.DB, key string) (string, error) {
 
 	var res []byte
 
@@ -15,14 +16,18 @@ func ReadData(db *bolt.DB, key string) string {
 
 		res = bucket.Get([]byte(key))
 
+		if len(res) == 0 {
+			return errors.New("No data found for " + key)
+		}
+
 		return nil
 	})
 
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
-	return string(res)
+	return string(res), nil
 }
 func ReadAll(db *bolt.DB) (map[string]string, error) {
 

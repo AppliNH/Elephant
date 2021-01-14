@@ -1,24 +1,25 @@
 package dcfile
 
 import (
-	. "applinh/elephant/models"
-	"fmt"
 	"io/ioutil"
 
+	"github.com/applinh/elephant/models"
 	"gopkg.in/yaml.v2"
 )
 
-func ReadDCfile(path string) DockerCompose {
+// ReadDCfile reads a compose file and return a DockerCompose obj to interact with
+func ReadDCfile(path string) (models.DockerCompose, error) {
 	dat, err := ioutil.ReadFile(path)
 	if err != nil {
-		fmt.Println(err)
+		return models.DockerCompose{}, err
 	}
-	t := DockerCompose{}
+	t := models.DockerCompose{}
 	erro := yaml.Unmarshal([]byte(dat), &t)
+
 	if erro != nil {
-		fmt.Println(err)
+		return models.DockerCompose{}, err
 	}
-	//fmt.Print(t)
-	return t
-	//return t, err
+
+	return t, nil
+
 }

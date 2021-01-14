@@ -1,20 +1,22 @@
 package dockercontrol
 
 import (
-	. "applinh/elephant/models"
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 
+	"github.com/applinh/elephant/models"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
-func createContainers(cli *client.Client, services map[string]Service, networks map[string]string, elephantName string) (map[string]RunningContainer, error) {
+func createContainers(cli *client.Client, services map[string]models.Service, networks map[string]string, elephantName string) (map[string]models.RunningContainer, error) {
 
-	containers := map[string]RunningContainer{}
+	containers := map[string]models.RunningContainer{}
 
 	for name, service := range services {
 		portBinding, _ := bindPortsBuilder(service.Ports)
@@ -25,12 +27,10 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 		}
 		//fmt.Println("ServiceImage: " + service.Image)
 		if _, err := cli.ImagePull(context.Background(), "docker.io/"+service.Image, types.ImagePullOptions{}); err != nil {
-			//fmt.Println("ImagePull: " + err.Error())
 			return nil, err
 		}
 
 		var containerConfig = &container.Config{Image: service.Image}
-		//fmt.Println("Speified Command: " + service.Command)
 
 		if service.Command != "" {
 			containerConfig = &container.Config{
@@ -38,6 +38,7 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 				Cmd:   strings.Split(service.Command, " "),
 			}
 		}
+		platform := &v1.Platform{OS: runtime.GOOS}
 
 		cont, err := cli.ContainerCreate(
 			context.Background(), containerConfig,
@@ -45,26 +46,24 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 				PortBindings: portBinding,
 			}, &network.NetworkingConfig{
 				EndpointsConfig: endpointsConfig,
-			}, elephantName+"_"+name)
+			}, platform, elephantName+"_"+name)
 
 		if err != nil {
 			//fmt.Println("ContainerCreate: " + err.Error())
 			return nil, err
-		} else {
-			containers[cont.ID] = RunningContainer{ID: cont.ID, Name: elephantName + "_" + name, Elephant: elephantName}
-			//fmt.Println(cont.ID)
 		}
+
+		containers[cont.ID] = models.RunningContainer{ID: cont.ID, Name: elephantName + "_" + name, Elephant: elephantName}
 
 	}
 
 	for _, container := range containers {
+
 		if err := startContainer(container.ID, cli); err == nil {
 			fmt.Println("Sucessfully started " + container.Name + " from elephant " + container.Elephant)
 		} else {
 			fmt.Println(err.Error())
 		}
-
-		//logsChan := make(chan io.ReadCloser)
 	}
 	fmt.Println(strings.Repeat("_", 25))
 	return containers, nil
@@ -74,10 +73,4 @@ func createContainers(cli *client.Client, services map[string]Service, networks 
 func startContainer(id string, cli *client.Client) error {
 	err := cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{})
 	return err
-
-	// ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	// defer cancel()
-
-	//ReadLogs(cli, id)
-
 }
