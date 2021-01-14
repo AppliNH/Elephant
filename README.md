@@ -31,7 +31,7 @@ You can either :
 
 ## Examples
 
-- `elephant walk -f ~/garbageDir/cool.yml` or `elephant walk -f ./cool.yml`
+- `elephant walk -f ~/garbageDir/cool.yml` or `elephant walk -f ./cool.yml` (eventually `elephant walk -f ./cool.yml -e myboi` if you want to directly specify the elephant name)
 - `elephant stomp myStack`
 - `elephant ls`
 
