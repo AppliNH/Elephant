@@ -17,8 +17,8 @@ Elephants are so so great that there are other commands they understand :)
 ## Install
 
 You can either :
-- Run `go install github.com/applinh/elephant`
-- Or clone the repo if you previously run `go build -o elephant` and then use the binary `./elephant` 
+- Run `go get -u github.com/applinh/elephant`
+- Or clone the repo, cd inside it and run `go install github.com/applinh/elephant`
 
 ## Commands
 
